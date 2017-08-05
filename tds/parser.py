@@ -1,6 +1,9 @@
 import logging
+from io import BytesIO
 from socket import socket
 
+from tds.packets import PACKET_HEADER_LEN
+from tds.packets import PacketHeader
 from .exceptions import AbortException
 
 EVENT_LOGIN = "login"
@@ -35,12 +38,11 @@ class Parser(object):
     def run(self):
         while True:
             try:
-                # TODO(benjamin): testing code
-                client_content = self.conn.recv(10)
-                self.logger.info('Receive from client, %s', client_content)
-                self.conn.send('1234567890')
-                self.conn.close()
-                raise AbortException()
+                header, data = self.parse_message_header()
+
+                method_name = self.PROCESS.get(header.packet_type, 'on_transfer')
+                method = getattr(self, method_name)
+                method(header, data)
             except AbortException as e:
                 # TODO(benjamin): process abort exception
                 self.logger.exception(e)
@@ -51,5 +53,21 @@ class Parser(object):
         """
         
         :param socket conn: 
+        :rtype: (PacketHeader, BytesIO)
         """
         # TODO(benjamin): add logical
+        conn = conn or self.conn
+        header = conn.recv(PACKET_HEADER_LEN)
+        if len(header) < self.PACKET_HEADER_LENGTH:
+            # TODO(benjamin): process disconnection
+            raise AbortException()
+        packet_header = PacketHeader()
+        packet_header.unmarshal(header)
+        length = packet_header.length - self.PACKET_HEADER_LENGTH
+        data = None
+        if length:
+            data = conn.recv(length)
+        return packet_header, BytesIO(data)
+
+    def on_transfer(self, header, buf, parse_token=False):
+        pass
