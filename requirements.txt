@@ -3,3 +3,4 @@ Gevent
 requests
 bunch
 GeventConnPool
+PyMsSQL
