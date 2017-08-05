@@ -1,0 +1,9 @@
+{
+  "name": "tds_proxy",
+  "image": "docker.neg/dfis/python-base:0.0.1",
+  "tag": "0.0.2",
+  "port": [8085],
+  "env": {"ENV":"development"},
+  "volume": [],
+  "cmd": [ "python","run.py"]
+}
