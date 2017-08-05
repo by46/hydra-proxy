@@ -9,6 +9,12 @@ EVENT_BATCH = "batch"
 
 
 class Parser(object):
+    PROCESS = {
+        0x01: 'on_batch',
+        0x10: 'on_login',
+        0x12: 'on_pre_login'
+    }
+
     def __init__(self, conn, address, logger=None):
         self.logger = logger or logging.getLogger(__name__)
         self.conn = conn
