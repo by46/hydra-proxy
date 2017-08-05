@@ -1,7 +1,11 @@
 import logging
+from datetime import datetime
 from io import BytesIO
 from socket import socket
 
+from bunch import Bunch
+
+from tds import mq
 from tds.packets import PACKET_HEADER_LEN
 from tds.packets import PacketHeader
 from .exceptions import AbortException
@@ -39,14 +43,12 @@ class Parser(object):
         while True:
             try:
                 header, data = self.parse_message_header()
-
                 method_name = self.PROCESS.get(header.packet_type, 'on_transfer')
                 method = getattr(self, method_name)
                 method(header, data)
             except AbortException as e:
-                # TODO(benjamin): process abort exception
                 self.logger.exception(e)
-                # TODO(benjamin): send logout event
+                self._send_logout_event()
                 break
 
     def parse_message_header(self, conn=None):
@@ -71,3 +73,37 @@ class Parser(object):
 
     def on_transfer(self, header, buf, parse_token=False):
         pass
+
+    def _make_event(self, event):
+        stamp = datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]
+
+        return Bunch(event=event,
+                     user=self.user,
+                     database=self.database,
+                     client_ip=self.client_ip,
+                     stamp=stamp)
+
+    def _send_output_event(self, message):
+        event = self._make_event(event=EVENT_OUTPUT)
+        event.size = len(message)
+        mq.send(event)
+
+    def _send_input_event(self, message):
+        event = self._make_event(event=EVENT_INPUT)
+        event.size = len(message)
+        mq.send(event)
+
+    def _send_batch_event(self, elapse, text, error):
+        event = self._make_event(event=EVENT_BATCH)
+        event.elapse = elapse
+        event.text = text
+        event.error = error
+        mq.send(event)
+
+    def _send_login_event(self):
+        event = self._make_event(event=EVENT_LOGIN)
+        mq.send(event)
+
+    def _send_logout_event(self):
+        event = self._make_event(event=EVENT_LOGOUT)
+        mq.send(event)
