@@ -1,6 +1,8 @@
 import logging
 from socket import socket
 
+from .exceptions import AbortException
+
 EVENT_LOGIN = "login"
 EVENT_LOGOUT = "logout"
 EVENT_INPUT = "input"
@@ -25,4 +27,18 @@ class Parser(object):
         self.settings = {}
 
     def run(self):
-        pass
+        while True:
+            try:
+                pass
+            except AbortException as e:
+                # TODO(benjamin): process abort exception
+                self.logger.exception(e)
+                # TODO(benjamin): send logout event
+                pass
+
+    def parse_message_header(self, conn=None):
+        """
+        
+        :param socket conn: 
+        """
+        # TODO(benjamin): add logical
