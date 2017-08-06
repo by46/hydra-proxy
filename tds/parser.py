@@ -170,7 +170,9 @@ class Parser(object):
         error_message = None
         if error_stream:
             self.logger.error('error occur')
-            error_message = error_stream.msg
+            error_message = "{0}.DB-Lib error message {1}, severity {2}".format(error_stream.msg,
+                                                                                error_stream.error_number,
+                                                                                error_stream.error_level)
 
         self.logger.info('batch sql elapse %s : %s', time() - cur, request.text)
         # TODO(benjamin): process batch error
