@@ -7,6 +7,7 @@ from time import time
 from bunch import Bunch
 
 import user
+from pool import manager
 from tds import mq
 from tds.exceptions import AbortException
 from tds.packets import PACKET_HEADER_LEN
@@ -21,7 +22,6 @@ from tds.tokens import EnvChangeStream
 from tds.tokens import InfoStream
 from tds.tokens import LoginAckStream
 from tds.tokens import PreLoginStream
-from pool import manager
 
 EVENT_LOGIN = "login"
 EVENT_LOGOUT = "logout"
@@ -107,17 +107,19 @@ class Parser(object):
         :param BytesIO buf: 
         """
         packet = LoginRequest(buf)
+        self.database = packet.database
+        self.user = packet.username
         info = user.login(packet.username, packet.password)
         if info is None:
             # TODO(benjamin): process login failed
             pass
         self.settings = {
-            "user": "CTIDbo",
-            "password": "Dev@CTIdb0",
-            "instance": "S1DSQL04\\EHISSQL",
-            "database": "CTI",
-            "ip": "S1DSQL04",
-            "port": 1433
+            "user": info.user,
+            "password": info.password,
+            "instance": "{0}\\{1}".format(info.server_name, info.database),
+            "database": self.database,
+            "ip": info.server_name,
+            "port": info.port
         }
         self.user = packet.username
         self.database = packet.database

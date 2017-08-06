@@ -24,7 +24,7 @@ class MSSQLConnectionPool(ConnectionPool):
         self.password = password
         self.database = database
         # TODO(benjamin): instance
-        self.server_name = "S1DSQL04\\EHISSQL"
+        self.server_name = "S1DSQL01\\ABS_SQL"
         if 'size' not in kwargs:
             kwargs['size'] = DEFAULT_POOL_SIZE
         super(MSSQLConnectionPool, self).__init__(**kwargs)
