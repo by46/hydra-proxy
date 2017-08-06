@@ -1,8 +1,7 @@
 from socket import socket
 
-from geventconnpool import ConnectionPool
-
 from tds import protocol
+from tds.packages.geventconnpool import ConnectionPool
 
 DEFAULT_POOL_SIZE = 20
 

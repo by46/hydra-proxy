@@ -1,16 +1,19 @@
 import logging
-import user
 from datetime import datetime
 from io import BytesIO
 from socket import socket
+from time import time
 
 from bunch import Bunch
 
+import user
 from tds import mq
+from tds.exceptions import AbortException
 from tds.packets import PACKET_HEADER_LEN
 from tds.packets import PacketHeader
 from tds.request import LoginRequest
 from tds.request import PreLoginRequest
+from tds.request import SQLBatchRequest
 from tds.response import LoginResponse
 from tds.tokens import Collation
 from tds.tokens import DoneStream
@@ -18,7 +21,7 @@ from tds.tokens import EnvChangeStream
 from tds.tokens import InfoStream
 from tds.tokens import LoginAckStream
 from tds.tokens import PreLoginStream
-from .exceptions import AbortException
+from pool import manager
 
 EVENT_LOGIN = "login"
 EVENT_LOGOUT = "logout"
@@ -149,8 +152,38 @@ class Parser(object):
         content = header.marshal(response)
         self.conn.sendall(content)
 
+    def on_batch(self, header, buf):
+        """
+
+        :param PacketHeader header: 
+        :param BytesIO buf: 
+        :return: 
+        """
+        cur = time()
+        request = SQLBatchRequest(buf)
+        self.on_transfer(header, buf)
+        elapse = time() - cur
+        logging.error('batch sql elapse %s : %s', time() - cur, request.text)
+        # TODO(benjamin): process batch error
+        self._send_batch_event(elapse, request.text, error=None)
+
     def on_transfer(self, header, buf, parse_token=False):
-        pass
+        """
+
+        :param PacketHeader header: 
+        :param BytesIO buf: 
+        :param bool parse_token: 
+        :rtype: [StreamSerializer]
+        """
+        message = header.marshal(buf)
+        pool = manager.get_connection(self.settings)
+        with pool.get() as conn:
+            conn.sendall(message)
+            self._send_input_event(message)
+            header, response_buf = self.parse_message_header(conn)
+        message = header.marshal(response_buf)
+        self.conn.sendall(message)
+        self._send_output_event(message)
 
     def _make_event(self, event):
         stamp = datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]

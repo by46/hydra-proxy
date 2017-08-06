@@ -1,5 +1,5 @@
 Six
-Gevent
+Gevent==1.2.0
 requests
 bunch
 GeventConnPool
