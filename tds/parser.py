@@ -1,4 +1,5 @@
 import logging
+import user
 from datetime import datetime
 from io import BytesIO
 from socket import socket
@@ -8,6 +9,15 @@ from bunch import Bunch
 from tds import mq
 from tds.packets import PACKET_HEADER_LEN
 from tds.packets import PacketHeader
+from tds.request import LoginRequest
+from tds.request import PreLoginRequest
+from tds.response import LoginResponse
+from tds.tokens import Collation
+from tds.tokens import DoneStream
+from tds.tokens import EnvChangeStream
+from tds.tokens import InfoStream
+from tds.tokens import LoginAckStream
+from tds.tokens import PreLoginStream
 from .exceptions import AbortException
 
 EVENT_LOGIN = "login"
@@ -60,16 +70,84 @@ class Parser(object):
         # TODO(benjamin): add logical
         conn = conn or self.conn
         header = conn.recv(PACKET_HEADER_LEN)
-        if len(header) < self.PACKET_HEADER_LENGTH:
+        if len(header) < PACKET_HEADER_LEN:
             # TODO(benjamin): process disconnection
             raise AbortException()
         packet_header = PacketHeader()
         packet_header.unmarshal(header)
-        length = packet_header.length - self.PACKET_HEADER_LENGTH
+        length = packet_header.length - PACKET_HEADER_LEN
         data = None
         if length:
             data = conn.recv(length)
         return packet_header, BytesIO(data)
+
+    def on_pre_login(self, header, buf):
+        """
+
+        :param PacketHeader header: 
+        :param BytesIO buf: 
+        """
+        request = PreLoginRequest(buf)
+        response = PreLoginStream()
+        response.version = (1426128904, 0)
+        response.encryption = PreLoginStream.ENCRYPT_NOT_SUP
+        response.inst_opt = ''
+        response.thread_id = 1234
+        header = PacketHeader()
+        content = header.marshal(response)
+        self.conn.sendall(content)
+
+    def on_login(self, header, buf):
+        """
+
+        :param PacketHeader header: 
+        :param BytesIO buf: 
+        """
+        packet = LoginRequest(buf)
+        info = user.login(packet.username, packet.password)
+        if info is None:
+            # TODO(benjamin): process login failed
+            pass
+        self.settings = {
+            "user": "CTIDbo",
+            "password": "Dev@CTIdb0",
+            "instance": "S1DSQL04\\EHISSQL",
+            "database": "CTI",
+            "ip": "S1DSQL04",
+            "port": 1433
+        }
+        self.user = packet.username
+        self.database = packet.database
+        self._send_login_event()
+
+        logging.error('logging password %s', packet.password)
+        response = LoginResponse()
+        env1 = EnvChangeStream()
+        env1.add(1, 'CTI', 'master')
+        sql_collation = Collation()
+        env2 = EnvChangeStream()
+        env2.add_bytes(EnvChangeStream.ENV_SQL_COLLATION, sql_collation.marshal())
+        env3 = EnvChangeStream()
+        env3.add(EnvChangeStream.ENV_LANGUAGE, 'us_english')
+        ack = LoginAckStream()
+        ack.program_name = "TDS"
+        env = EnvChangeStream()
+        env.add(EnvChangeStream.ENV_DATABASE, '4096', '4096')
+        done = DoneStream()
+        info = InfoStream()
+        info.msg = "Changed database context to 'CTI'."
+        info.server_name = 'S1DSQL04\\EHISSQL'
+        info.line_number = 10
+
+        response.add_component(env1)
+        response.add_component(info)
+        response.add_component(ack)
+        response.add_component(env)
+        response.add_component(done)
+
+        header = PacketHeader()
+        content = header.marshal(response)
+        self.conn.sendall(content)
 
     def on_transfer(self, header, buf, parse_token=False):
         pass
