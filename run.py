@@ -3,6 +3,7 @@ import gevent.monkey
 gevent.monkey.patch_all()
 
 import logging
+from tds.logger import BetterRotatingFileHandler
 from socket import socket
 
 from gevent.server import StreamServer
@@ -10,6 +11,18 @@ from gevent.server import StreamServer
 from tds import Parser
 
 logger = logging.getLogger('tds')
+max_byte = 1024 * 1024 * 10
+backup_count = 3
+filename = "logs/error.log"
+handler = BetterRotatingFileHandler(filename=filename, maxBytes=max_byte, backupCount=backup_count)
+handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+handler.setLevel('INFO')
+logger.addHandler(handler)
+
+handler = logging.StreamHandler()
+handler.setLevel('INFO')
+logger.addHandler(handler)
+
 
 def handle(sock, address):
     """
@@ -18,8 +31,8 @@ def handle(sock, address):
     :param address: 
     :return: 
     """
-    logging.error('address %s', address)
-    parser = Parser(sock, address)
+    logger.info('address %s', address)
+    parser = Parser(sock, address, logger=logger)
     parser.run()
 
 

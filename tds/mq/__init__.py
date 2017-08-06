@@ -20,4 +20,18 @@ def send(event):
         'InvokeType': 'Message'
     }
     response = session.post(url, headers=headers, json=json)
+    # TODO(benjamin): process error
     assert response.status_code == 201
+
+
+if __name__ == '__main__':
+    send(event={
+        "stamp": "20170802140000",
+        "user": "user1",
+        "database": "EHISQL",
+        "client_ip": "10.16.82.135",
+        "event": "batch",
+        "text": "SELECT * FROM User LIMIT 10;",
+        "elapse": 120,
+        "error": "Unknown Databases"
+    })

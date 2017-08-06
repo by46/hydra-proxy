@@ -125,7 +125,7 @@ class Parser(object):
         self.database = packet.database
         self._send_login_event()
 
-        logging.error('logging password %s', packet.password)
+        self.logger.info('logging password %s', packet.password)
         response = LoginResponse()
         env1 = EnvChangeStream()
         env1.add(1, 'CTI', 'master')
@@ -165,7 +165,7 @@ class Parser(object):
         request = SQLBatchRequest(buf)
         self.on_transfer(header, buf)
         elapse = time() - cur
-        logging.error('batch sql elapse %s : %s', time() - cur, request.text)
+        self.logger.info('batch sql elapse %s : %s', time() - cur, request.text)
         # TODO(benjamin): process batch error
         self._send_batch_event(elapse, request.text, error=None)
 
@@ -188,7 +188,7 @@ class Parser(object):
         self._send_output_event(message)
 
     def _make_event(self, event):
-        stamp = datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]
+        stamp = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-3]
 
         return Bunch(event=event,
                      user=self.user,
