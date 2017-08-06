@@ -1,6 +1,6 @@
 import gevent.monkey
 
-# gevent.monkey.patch_all()
+gevent.monkey.patch_all()
 
 import logging
 from socket import socket
