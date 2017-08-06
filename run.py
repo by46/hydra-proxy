@@ -9,6 +9,7 @@ from gevent.server import StreamServer
 
 from tds import Parser
 
+logger = logging.getLogger('tds')
 
 def handle(sock, address):
     """

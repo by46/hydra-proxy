@@ -18,7 +18,7 @@ def pre_login(conn):
     stream.version = (1426128904, 0)
     stream.encryption = PreLoginStream.ENCRYPT_NOT_SUP
     stream.inst_opt = "MSSQLServer"
-    stream.thread_id = threading.current_thread().ident
+    stream.thread_id = threading.current_thread().ident % 4294967295
     packet = PacketHeader()
     packet.packet_type = PacketHeader.TYPE_PRE_LOGIN
     conn.sendall(packet.marshal(stream))
