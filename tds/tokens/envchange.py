@@ -1,3 +1,6 @@
+import struct
+from io import BytesIO
+
 from tds.base import StreamSerializer
 from tds.utils import b_varbyte_encode
 from tds.utils import b_varchar_encode
@@ -34,3 +37,15 @@ class EnvChangeStream(StreamSerializer):
 
     def add_bytes(self, env_type, new_value=None, old_value=None):
         self.add(env_type, new_value, old_value, encode=b_varbyte_encode)
+
+    def unmarshal(self, buf):
+        """
+        
+        :param BytesIO buf: 
+        :rtype: bool
+        """
+        token_type, length = struct.unpack('<BH', buf.read(3))
+        assert token_type == self.TOKEN_TYPE
+        # TODO(benjamin): add parse logical
+        data = buf.read(length)
+        return True

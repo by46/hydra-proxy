@@ -22,6 +22,7 @@ from tds.tokens import EnvChangeStream
 from tds.tokens import InfoStream
 from tds.tokens import LoginAckStream
 from tds.tokens import PreLoginStream
+from tds.tokens import parse_error
 
 EVENT_LOGIN = "login"
 EVENT_LOGOUT = "logout"
@@ -163,11 +164,17 @@ class Parser(object):
         """
         cur = time()
         request = SQLBatchRequest(buf)
-        self.on_transfer(header, buf)
+        response_buf = self.on_transfer(header, buf)
         elapse = time() - cur
+        error_stream = parse_error(response_buf)
+        error_message = None
+        if error_stream:
+            self.logger.error('error occur')
+            error_message = error_stream.msg
+
         self.logger.info('batch sql elapse %s : %s', time() - cur, request.text)
         # TODO(benjamin): process batch error
-        self._send_batch_event(elapse, request.text, error=None)
+        self._send_batch_event(elapse, request.text, error=error_message)
 
     def on_transfer(self, header, buf, parse_token=False):
         """
@@ -186,6 +193,8 @@ class Parser(object):
         message = header.marshal(response_buf)
         self.conn.sendall(message)
         self._send_output_event(message)
+
+        return response_buf
 
     def _make_event(self, event):
         stamp = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-3]
