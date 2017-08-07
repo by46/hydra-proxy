@@ -16,13 +16,13 @@ backup_count = 3
 filename = "logs/error.log"
 handler = BetterRotatingFileHandler(filename=filename, maxBytes=max_byte, backupCount=backup_count)
 handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-handler.setLevel('INFO')
+handler.setLevel('NOTSET')
 logger.addHandler(handler)
 
 handler = logging.StreamHandler()
-handler.setLevel('INFO')
+handler.setLevel('NOTSET')
 logger.addHandler(handler)
-
+logger.setLevel('INFO')
 
 def handle(sock, address):
     """

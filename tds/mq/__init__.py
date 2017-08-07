@@ -1,3 +1,4 @@
+import logging
 from json import dumps
 
 import requests
@@ -8,6 +9,7 @@ a = HTTPAdapter(max_retries=3)
 session.mount('http://', a)
 a = HTTPAdapter(max_retries=3)
 session.mount('https://', a)
+logger = logging.getLogger('tds')
 
 
 def send(event):
@@ -20,9 +22,11 @@ def send(event):
         'ContentType': 'Application/Json',
         'InvokeType': 'Message'
     }
+    logger.info('send mq starting')
     response = session.post(url, headers=headers, json=json)
     # TODO(benjamin): process error
-    assert response.status_code == 201
+    if response.status_code != 201:
+        logger.error('send mq failed, %s', response.content)
 
 
 if __name__ == '__main__':
