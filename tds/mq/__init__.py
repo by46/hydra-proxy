@@ -14,6 +14,7 @@ logger = logging.getLogger('tds')
 
 def send(event):
     url = 'http://apis.newegg.org/framework/v1/enterprise-messaging/message'
+    url = 'http://10.1.54.117/framework/v1/enterprise-messaging/message'
     # url = 'http://10.16.75.24:3000/framework/v1/enterprise-messaging/message'
     headers = {'Content-Type': 'Application/Json', 'Accept': 'Application/Json'}
     json = {
@@ -22,8 +23,9 @@ def send(event):
         'ContentType': 'Application/Json',
         'InvokeType': 'Message'
     }
-    logger.info('send mq starting')
     response = session.post(url, headers=headers, json=json)
+
+    logger.info('send mq starting %s', response.status_code)
     # TODO(benjamin): process error
     if response.status_code != 201:
         logger.error('send mq failed, %s', response.content)
