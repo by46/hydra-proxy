@@ -62,7 +62,8 @@ class Parser(object):
                 method(header, data)
             except AbortException as e:
                 self.logger.exception(e)
-                self._send_logout_event()
+                if self.user:
+                    self._send_logout_event()
                 break
 
     def parse_message_header(self, conn=None):
@@ -170,9 +171,9 @@ class Parser(object):
         error_message = None
         if error_stream:
             self.logger.error('error occur')
-            error_message = "{0}.DB-Lib error message {1}, severity {2}".format(error_stream.msg,
-                                                                                error_stream.error_number,
-                                                                                error_stream.error_level)
+            error_message = "{0}DB-Lib error message {1}, severity {2}".format(error_stream.msg,
+                                                                               error_stream.error_number,
+                                                                               error_stream.error_level)
 
         self.logger.info('batch sql elapse %s : %s', time() - cur, request.text)
         # TODO(benjamin): process batch error

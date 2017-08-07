@@ -7,7 +7,7 @@ TDS Protocol Proxy
 size unit : byte
 ```json
 {
-	"stamp": "20170802140000",
+	"stamp": "20170802140000000",
 	"user": "user1",
 	"database": "EHISQL",
 	"client_ip": "10.16.82.135",
@@ -21,7 +21,7 @@ size unit : byte
 
 ```json
 {
-	"stamp": "20170802140000",
+	"stamp": "20170802140000000",
 	"user": "user1",
 	"database": "EHISQL",
 	"client_ip": "10.16.82.135",
@@ -34,7 +34,7 @@ size unit : byte
 
 ```json
 {
-	"stamp": "20170802140000",
+	"stamp": "20170802140000000",
 	"user": "user1",
 	"database": "EHISQL",
 	"client_ip": "10.16.82.135",
@@ -46,7 +46,7 @@ size unit : byte
 
 ```json
 {
-	"stamp": "20170802140000",
+	"stamp": "20170802140000000",
 	"user": "user1",
 	"database": "EHISQL",
 	"client_ip": "10.16.82.135",
@@ -62,7 +62,7 @@ show error message if some exception occur
 
 ```json
 {
-	"stamp": "20170802140000",
+	"stamp": "20170802140000000",
 	"user": "user1",
 	"database": "EHISQL",
 	"client_ip": "10.16.82.135",
