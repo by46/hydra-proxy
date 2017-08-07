@@ -14,7 +14,7 @@ logger = logging.getLogger('tds')
 
 def send(event):
     url = 'http://apis.newegg.org/framework/v1/enterprise-messaging/message'
-    url = 'http://10.1.54.117/framework/v1/enterprise-messaging/message'
+    url = 'http://10.1.54.117:8078/framework/v1/enterprise-messaging/message'
     # url = 'http://10.16.75.24:3000/framework/v1/enterprise-messaging/message'
     headers = {'Content-Type': 'Application/Json', 'Accept': 'Application/Json'}
     json = {
