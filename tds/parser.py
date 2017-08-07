@@ -166,7 +166,7 @@ class Parser(object):
         cur = time()
         request = SQLBatchRequest(buf)
         response_buf = self.on_transfer(header, buf)
-        elapse = time() - cur
+        elapse = int((time() - cur) * 1000)
         error_stream = parse_error(response_buf)
         error_message = None
         if error_stream:
@@ -175,7 +175,7 @@ class Parser(object):
                                                                                error_stream.error_number,
                                                                                error_stream.error_level)
 
-        self.logger.info('batch sql elapse %s : %s', time() - cur, request.text)
+        self.logger.info('batch sql elapse %s ms: %s', elapse, request.text)
         # TODO(benjamin): process batch error
         self._send_batch_event(elapse, request.text, error=error_message)
 
