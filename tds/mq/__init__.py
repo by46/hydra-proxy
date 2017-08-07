@@ -12,6 +12,7 @@ session.mount('https://', a)
 
 def send(event):
     url = 'http://apis.newegg.org/framework/v1/enterprise-messaging/message'
+    url = 'http://10.16.75.24:3000/framework/v1/enterprise-messaging/message'
     headers = {'Content-Type': 'Application/Json', 'Accept': 'Application/Json'}
     json = {
         'MessageName': 'DFIS_TDS',
