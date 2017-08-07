@@ -20,6 +20,7 @@ handler.setLevel('NOTSET')
 logger.addHandler(handler)
 
 handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 handler.setLevel('NOTSET')
 logger.addHandler(handler)
 logger.setLevel('INFO')
