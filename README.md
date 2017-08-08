@@ -73,3 +73,11 @@ show error message if some exception occur
 	"error": "Unknown Databases"
 }
 ```
+
+
+## RUN
+
+```shell
+
+sudo docker run --name tds-proxy -dt --network=host docker.neg/cdmis-hackathon/tds_proxy:0.0.2.build30.d1969
+```

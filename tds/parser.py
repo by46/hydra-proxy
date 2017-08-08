@@ -112,9 +112,10 @@ class Parser(object):
         self.database = packet.database
         self.user = packet.username
         info = user.login(packet.username, packet.password)
-        if info is None:
+        if info in (None, False):
             # TODO(benjamin): process login failed
-            pass
+            self.logger.error("Login failed %s", info)
+            raise AbortException()
         self.settings = {
             "user": info.user,
             "password": info.password,
