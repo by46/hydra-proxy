@@ -1,14 +1,12 @@
-import gevent.monkey
-
 # gevent.monkey.patch_all()
 
 import logging
-from tds.logger import BetterRotatingFileHandler
 from socket import socket
 
 from gevent.server import StreamServer
 
 from tds import Parser
+from tds.logger import BetterRotatingFileHandler
 
 logger = logging.getLogger('tds')
 max_byte = 1024 * 1024 * 10
@@ -24,6 +22,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)
 handler.setLevel('NOTSET')
 # logger.addHandler(handler)
 logger.setLevel('INFO')
+
 
 def handle(sock, address):
     """

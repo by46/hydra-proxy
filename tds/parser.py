@@ -231,4 +231,5 @@ class Parser(object):
 
     def _send_logout_event(self):
         event = self._make_event(event=EVENT_LOGOUT)
+        self.logger.info("send logout event %s", event)
         mq.send(event)
