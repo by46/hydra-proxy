@@ -1,6 +1,7 @@
 # Hydra Proxy
 
-TDS Protocol Proxy, 主要用作用户登录， 链接管理， TDS协议转发，针对MSSQL TDS 协议的转发。
+TDS Protocol Proxy, 主要用作用户登录， 链接管理， TDS协议转发，针对MSSQL TDS 协议的解析和转发。
+并且收集一些用于统计的数据.
 
 
 # Event
@@ -79,5 +80,5 @@ show error message if some exception occur
 
 ```shell
 
-sudo docker run --name tds-proxy -dt --network=host docker.neg/cdmis-hackathon/tds_proxy:0.0.2.build31.f5335
+sudo docker run --name tds-proxy -dt --network=host docker.neg/cdmis-hackathon/tds_proxy:0.0.2.build34.e971e
 ```
