@@ -24,9 +24,6 @@ def send(event):
         'InvokeType': 'Message'
     }
     response = session.post(url, headers=headers, json=json)
-
-    logger.info('send mq starting %s', response.status_code)
-    # TODO(benjamin): process error
     if response.status_code != 201:
         logger.error('send mq failed, %s', response.content)
 
