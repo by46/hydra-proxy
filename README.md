@@ -1,6 +1,7 @@
 # Hydra Proxy
 
-TDS Protocol Proxy
+TDS Protocol Proxy, 主要用作用户登录， 链接管理， TDS协议转发，针对MSSQL TDS 协议的转发。
+
 
 # Event
 ## Input Event
