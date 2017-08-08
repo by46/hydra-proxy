@@ -60,11 +60,12 @@ class Parser(object):
                 method_name = self.PROCESS.get(header.packet_type, 'on_transfer')
                 method = getattr(self, method_name)
                 method(header, data)
-            except AbortException as e:
+            except Exception as e:
                 self.logger.exception(e)
                 if self.user:
                     self._send_logout_event()
                 break
+
 
     def parse_message_header(self, conn=None):
         """
